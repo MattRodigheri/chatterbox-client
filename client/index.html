@@ -7,6 +7,7 @@
 
     <!-- dependencies -->
     <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/jquery/dist/jquery.js"></script>
     <script>
       // YOU DO NOT NEED TO EDIT THIS CODE
       if (!/(&|\?)username=/.test(window.location.search)) {
@@ -25,7 +26,17 @@
   <body>
     <div id="main">
       <h1>chatterbox</h1>
-      <!-- Your HTML goes here! -->
+      <div>
+        <h3>User Name Input</h3>
+        <input type='text' class='usernameInput'>
+        <h3>Message Input</h3>
+        <textarea class='messageInput'></textarea>
+        <div> <button class='submit'> Submit </button> </div>
+        <h3>Rooms</h3>
+        <select>
+          <!-- <option value="">Volvo</option> -->
+        </select>
+      </div>
     </div>
     <div id="chats"></div>
   </body>
