@@ -1,13 +1,25 @@
 var app = {};
 
-$('document').ready(function() { app.fetch(); });
+$('document').ready(function() { 
+  app.init();
+  $('#send .submit').on('submit', function() {
+    app.handleSubmit();
+  });
+});
 
 app.server = 'http://parse.sfm8.hackreactor.com/chatterbox/classes/messages';
+app.storage = [];
+app.rooms = [];
 
 app.init = function(data) {
-  var messages = data.results;
-  app.refreshFeed(messages);
-  app.addEventListeners();
+  $('.username').on('click', function() { app.handleUsernameClick(); });
+  $('.roomSubmit').on('click', function() {
+    var roomName = $('.roomInput').val();
+    app.createRoom(roomName);
+    $('.roomInput').val('');
+  });
+  app.fetch();
+  setTimeout(app.refreshFeed, 200);
 };
 
 app.send = function(message) {
@@ -26,13 +38,12 @@ app.send = function(message) {
 };
 
 app.fetch = function() {
-  return $.ajax({
+  $.ajax({
     url: app.server,
     type: 'GET',
     success: function (data) {
       console.log('chatterbox: Message recieved');
-      app.init(data);
-      return data;
+      app.storage = data;
     },
     error: function (data) {
       console.error('chatterbox: Failed to recieve message', data);
@@ -45,7 +56,7 @@ app.clearMessages = function() {
 };
 
 app.renderMessage = function(message) {
-  var usernameNode = $(`<span class="username"> <p> ${message.username} </p> </span>`);
+  var usernameNode = $(`<span class="username"> ${message.username} </span>`);
   var textNode = $(`<span> <p> ${message.text} </p> </span>`);
   $('#chats').append(usernameNode);
   usernameNode.append(textNode);
@@ -83,8 +94,27 @@ app.addEventListeners = function() {
 };
 
 app.refreshFeed = function(messages) {
+  var messages = app.storage.results;
   messages.forEach(function(message) {
     var node = app.renderMessage(message);
-    node.on('click', app.handleUsernameClick);
+    node.click(app.handleUsernameClick);
   });
+  app.createRoomsFromMessages();
 };
+
+app.createRoomsFromMessages = function() {
+  var messages = app.storage.results;
+  messages.forEach(function(message) {
+    if (message.hasOwnProperty('roomname')) {
+      if (message.roomname !== '' && !app.rooms.includes(message.roomname)) {
+        app.createRoom(message.roomname);
+      }
+    }
+  });
+}
+
+app.createRoom = function(roomName) {
+  var node = `<option value="">${roomName}</option>`
+  $('.rooms').append(node);
+  app.rooms.push(roomName); 
+}
